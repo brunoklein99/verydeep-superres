@@ -1,3 +1,6 @@
+import os
+import torch
+
 from torch.autograd import Variable
 
 import settings
@@ -7,6 +10,17 @@ from torch.utils.data import DataLoader
 from model import Net
 
 from dataset import Dataset
+
+
+def save_parameters(model, epoch):
+    model_out_path = "parameters/" + "model_epoch_{}.pth".format(epoch)
+
+    state = {"epoch": epoch, "model": model}
+
+    torch.save(state, model_out_path)
+
+    print("Checkpoint saved to {}".format(model_out_path))
+
 
 if __name__ == '__main__':
     dataset = Dataset('train.h5')
@@ -36,3 +50,5 @@ if __name__ == '__main__':
 
             if i % 100 == 0:
                 print("Epoch {} ({}/{}): Loss: {:.10f}".format(epoch, i, len(loader), loss.data[0]))
+
+        save_parameters(model, epoch)

@@ -60,3 +60,26 @@ def eval(model):
 
     print("PSNR_predicted=", avg_psnr_predicted / len(image_list))
     print("PSNR_bicubic=", avg_psnr_bicubic / len(image_list))
+
+
+if __name__ == '__main__':
+    model = torch.load('parameters/model_epoch_7.pth', lambda s, l: s)['model']
+    # model = model.cuda()
+    model.eval()
+
+    hr = cv2.imread('images/forest_lr.jpg', cv2.IMREAD_GRAYSCALE)
+    h, w = hr.shape
+    hr = cv2.resize(hr, (h // 2, w // 2))
+    hr = cv2.resize(hr, (h, w), interpolation=cv2.INTER_CUBIC)
+    hr = np.expand_dims(hr, axis=0)
+    hr = np.expand_dims(hr, axis=0)
+    hr = hr.astype(dtype=np.float32)
+    hr /= 255
+    hr = Variable(torch.from_numpy(hr).float()) #.cuda()
+    hr = model(hr)
+    hr = hr.data.numpy().astype(np.float32)
+    hr *= 255
+    cv2.imwrite('images/forest_hr.jpg', hr)
+
+    # eval(model)
+
